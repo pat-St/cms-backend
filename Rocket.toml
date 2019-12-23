@@ -1,0 +1,17 @@
+[global]
+port = 8000
+keep_alive = 5
+log = "normal"
+workers = 4
+limits = { forms = 32768 }
+
+[development]
+address = "localhost"
+
+[staging]
+address = "0.0.0.0"
+
+[production]
+address = "0.0.0.0"
+port = 8000
+log = "critical"
