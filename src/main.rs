@@ -1,6 +1,6 @@
 #![feature(proc_macro_hygiene, decl_macro, bind_by_move_pattern_guards)]
 #![feature(plugin)]
-#![feature(custom_attribute)]
+// #![feature(custom_attribute)]
 #![feature(specialization)]
 #![feature(const_fn)]
 extern crate dotenv;
