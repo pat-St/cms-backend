@@ -175,13 +175,13 @@ fn main() {
         .mount(
             "/user",
             routes![
-                user_controller::user_controller::user_login,
-                user_controller::user_controller::user_create,
-                user_controller::user_controller::user_logout,
-                user_controller::user_controller::options_signing_response,
-                user_controller::user_controller::options_response,
-                user_controller::user_controller::post_mock,
-                user_controller::user_controller::check_token,
+                user_controller::login_controller::user_login,
+                user_controller::login_controller::user_create,
+                user_controller::login_controller::user_logout,
+                user_controller::login_controller::options_signing_response,
+                user_controller::login_controller::options_response,
+                user_controller::login_controller::post_mock,
+                user_controller::login_controller::check_token,
                 ]
         )
         .launch();

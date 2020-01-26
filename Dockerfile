@@ -7,8 +7,8 @@ RUN cargo +nightly build --release
 
 FROM debian:latest
 EXPOSE 8000
-ENV RUST_BACKTRACE=1
-ENV DATABASE_URL=mysql://root:pass@localhost:3306/ferienwvk_db1
+# ENV RUST_BACKTRACE=1
+# ENV DATABASE_URL=mysql://root:pass@localhost:3306/ferienwvk_db1
 COPY --from=builder /usr/src/backend/target/release/backend /usr/local/bin
 RUN apt-get update && apt-get install -y libssl-dev
 ENTRYPOINT ["/usr/local/bin/backend"]
