@@ -1,7 +1,7 @@
 #!/bin/bash
 rm -r target
 echo "build image"
-# docker build -t cms-backend .
+docker build -t cms-backend .
 echo "start container"
 if [[ -n ${DATABASE_URL+x} ]]; then 
     echo "Env is set"
