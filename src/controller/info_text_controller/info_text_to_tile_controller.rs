@@ -2,7 +2,7 @@ use rocket_contrib::json::Json;
 use model::info_text::info_text_to_tile::InfoTextToTile;
 use model::model_template::ModelTemplate;
 use service::response_config::ResponseWithHeader;
-use model::user::user::AuthGuard;
+use service::request_config::AuthGuard;
 #[get("/")]
 pub fn get_all_objects(_db_conn: AuthGuard) -> ResponseWithHeader<Vec<InfoTextToTile>> {
     ResponseWithHeader(InfoTextToTile::get_multi_object(_db_conn.0))

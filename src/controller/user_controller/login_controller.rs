@@ -4,7 +4,7 @@ use model::model_template::ModelTemplate;
 use rocket::http::RawStr;
 use service::db_connector::Connection;
 use service::request_config::BasicAuth;
-use model::user::user::AuthGuard;
+use service::request_config::AuthGuard;
 use rocket_contrib::json::Json;
 use service::response_config::ResponseWithHeader;
 

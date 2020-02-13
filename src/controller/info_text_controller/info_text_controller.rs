@@ -2,7 +2,7 @@ use rocket_contrib::json::Json;
 use model::info_text::info_text::InfoText;
 use model::model_template::ModelTemplate;
 use service::response_config::ResponseWithHeader;
-use model::user::user::AuthGuard;
+use service::request_config::AuthGuard;
 
 #[get("/")]
 pub fn get_all_objects(_db_conn: AuthGuard) -> ResponseWithHeader<Vec<InfoText>> {

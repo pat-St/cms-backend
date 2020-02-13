@@ -2,9 +2,6 @@ use mysql::Row;
 use model::model_template::ModelTemplate;
 use service::db_connector::Connection;
 
-#[derive(Debug, Clone)]
-pub struct AuthGuard(pub Connection);
-
 #[allow(non_snake_case)]
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize,Clone)]
 pub struct WUser {

@@ -20,7 +20,7 @@ mod model;
 
 use rocket::{Request, Response};
 use rocket_contrib::json::{Json, JsonValue};
-use controller::{image_controller, info_text_controller, tile_controller,info_text_to_tile_controller, user_controller};
+use controller::{image_controller, info_text_controller, tile_controller, user_controller};
 use controller::apartment_controller::*;
 use service::db_connector::Connection;
 use rocket::http::{Status};
@@ -151,25 +151,25 @@ fn main() {
         .mount(
             "/info_text",
             routes![
-            info_text_controller::get_single_object_by_id,
-            info_text_controller::get_all_objects,
-            info_text_controller::create_objects,
-            info_text_controller::update_objects,
-            info_text_controller::options_response,
-            info_text_controller::options_id_response,
-            info_text_controller::delete_objects
+            info_text_controller::info_text_controller::get_single_object_by_id,
+            info_text_controller::info_text_controller::get_all_objects,
+            info_text_controller::info_text_controller::create_objects,
+            info_text_controller::info_text_controller::update_objects,
+            info_text_controller::info_text_controller::options_response,
+            info_text_controller::info_text_controller::options_id_response,
+            info_text_controller::info_text_controller::delete_objects
             ],
         )
         .mount(
             "/info_text_to_tile",
             routes![
-                info_text_to_tile_controller::get_single_object_by_id,
-                info_text_to_tile_controller::get_all_objects,
-                info_text_to_tile_controller::create_objects,
-                info_text_to_tile_controller::update_objects,
-                info_text_to_tile_controller::options_response,
-                info_text_to_tile_controller::options_id_response,
-                info_text_to_tile_controller::delete_objects
+                info_text_controller::info_text_to_tile_controller::get_single_object_by_id,
+                info_text_controller::info_text_to_tile_controller::get_all_objects,
+                info_text_controller::info_text_to_tile_controller::create_objects,
+                info_text_controller::info_text_to_tile_controller::update_objects,
+                info_text_controller::info_text_to_tile_controller::options_response,
+                info_text_controller::info_text_to_tile_controller::options_id_response,
+                info_text_controller::info_text_to_tile_controller::delete_objects
                 ],
         )
         .mount(

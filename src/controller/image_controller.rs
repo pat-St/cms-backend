@@ -4,7 +4,7 @@ use rocket_contrib::json::Json;
 use model::image::image::Image;
 use model::image::images_template::ImagesTemplate;
 use service::response_config::{ResponseWithHeader, ImageResponse};
-use model::user::user::AuthGuard;
+use service::request_config::AuthGuard;
 
 #[get("/")]
 pub fn get_all_objects(_db_conn: AuthGuard) -> ResponseWithHeader<Vec<Image>> {
