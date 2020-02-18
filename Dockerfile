@@ -1,7 +1,7 @@
 FROM rustlang/rust:nightly AS builder
 WORKDIR /usr/src/backend
 ENV CARGO_HOME=/usr/src/backend/.cargo
-ENV ROCKET_ENV=stage
+ENV ROCKET_ENV=prod
 COPY . .
 RUN cargo +nightly build --release
 
