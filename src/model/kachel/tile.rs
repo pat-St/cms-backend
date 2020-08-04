@@ -10,7 +10,7 @@ pub struct Tile {
     pub description: Option<String>,
     pub kachelType: u16,
     pub modalType: u16,
-    pub kachelSize: u16,
+    pub tileSizeType: u16,
 }
 
 impl ModelTemplate<Tile> for Tile {
@@ -26,7 +26,7 @@ impl ModelTemplate<Tile> for Tile {
              description=:desc, \
              kachelType=:kachel_type,\
              modalType=:modal_type, \
-             kachelSize=:kachel_size \
+             tileSizeType=:tile_size \
              WHERE id=:u_id") {
             Ok(mut stmt) => {
                 for obj in insert_object.iter() {
@@ -37,7 +37,7 @@ impl ModelTemplate<Tile> for Tile {
                             "desc"=>&obj.description,
                             "kachel_type"=>obj.kachelType,
                             "modal_type"=>obj.modalType,
-                            "kachel_size"=>obj.kachelSize}
+                            "tile_size"=>obj.tileSizeType}
                     ).unwrap();
                 }
             }
@@ -71,7 +71,7 @@ impl ModelTemplate<Tile> for Tile {
             None => return false
         };
         println!("Insert object: ");
-        match connection.prepare("INSERT INTO Tile (id,titleName,description,kachelType,modalType,kachelSize) VALUES (:u_id,:title_name,:desc,:kachel_type,:modal_type,:kachel_size)") {
+        match connection.prepare("INSERT INTO Tile (id,titleName,description,kachelType,modalType,tileSizeType) VALUES (:u_id,:title_name,:desc,:kachel_type,:modal_type,:tile_size)") {
             Ok(mut stmt) => {
                 for obj in insert_object.iter() {
                     stmt.execute(
@@ -81,7 +81,7 @@ impl ModelTemplate<Tile> for Tile {
                             "desc"=>&obj.description,
                             "kachel_type"=>obj.kachelType,
                             "modal_type"=>obj.modalType,
-                            "kachel_size"=>obj.kachelSize}
+                            "tile_size"=>obj.tileSizeType}
                     ).unwrap();
                 }
             }
@@ -111,7 +111,7 @@ impl ModelTemplate<Tile> for Tile {
         match mysql::from_row_opt(item) {
             Ok(value) => {
                 let q_obj: (u16, String, Option<String>, u16, u16, u16) = value;
-                Some(Self { ID: q_obj.0, titleName: q_obj.1, description: q_obj.2, kachelType: q_obj.3, modalType: q_obj.4, kachelSize: q_obj.5 })
+                Some(Self { ID: q_obj.0, titleName: q_obj.1, description: q_obj.2, kachelType: q_obj.3, modalType: q_obj.4, tileSizeType: q_obj.5 })
             }
             Err(e) => {
                 println!("{}", e);

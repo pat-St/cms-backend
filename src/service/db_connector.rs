@@ -49,8 +49,6 @@ impl Connection {
                 "".to_string()
             }
         }
-        
-        //dotenv::var("DATABASE_URL").unwrap()
     }
 
     fn reconnect(counter: u8) -> Option<Pool> {

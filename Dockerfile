@@ -3,7 +3,7 @@ WORKDIR /usr/src/backend
 ENV CARGO_HOME=/usr/src/backend/.cargo
 ENV ROCKET_ENV=prod
 COPY . .
-RUN cargo +nightly build --release
+RUN cargo +nightly build --release && cargo +nightly check
 
 FROM debian:latest
 EXPOSE 8001
