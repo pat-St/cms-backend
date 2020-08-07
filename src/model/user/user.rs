@@ -14,6 +14,32 @@ pub struct WUser {
 }
 
 impl ModelTemplate<WUser> for WUser {
+    fn insert_values_object(conn: Connection, insert_object: Vec<WUser>) -> bool {
+        let mut connection;
+        match conn.get_connection() {
+            Some(value) => connection = value,
+            None => return false
+        };
+        println!("Insert object: ");
+        match connection.prepare("INSERT INTO WUser (id, name, pw, salt, token, mail) VALUES (:u_id, :u_name, :u_pw, :u_salt, :u_token, :u_mail)") {
+            Ok(mut stmt) => {
+                for obj in insert_object.iter() {
+                    stmt.execute(
+                        params! {
+                            "u_id"=>obj.ID,
+                            "u_name"=>&obj.name,
+                            "u_pw"=>&obj.pw,
+                            "u_salt"=>&obj.salt,
+                            "u_token"=>&obj.token,
+                            "u_mail"=>&obj.mail
+                        }
+                    ).unwrap();
+                }
+            }
+            Err(e) => println!("{}", e.to_string())
+        };
+        true
+    }
     fn update_values_object(conn: Connection, insert_object: Vec<WUser>) -> bool {
         let mut connection;
         match conn.get_connection() {
@@ -50,7 +76,7 @@ impl ModelTemplate<WUser> for WUser {
     }
     fn delete_values_object(conn: Connection, object_id: u16) -> bool {
         match conn.get_connection() {
-            Some(mut value) => 
+            Some(mut value) =>
                 match value.prepare("DELETE FROM WUser WHERE id=:u_id") {
                     Ok(mut stmt) => {
                         stmt.execute(params! {"u_id"=>object_id}).unwrap();
@@ -58,37 +84,11 @@ impl ModelTemplate<WUser> for WUser {
                     }
                     Err(e) => {
                         println!("{}", e.to_string());
-                        false 
+                        false
                     }
                 },
             None => false
         }
-    }
-    fn insert_values_object(conn: Connection, insert_object: Vec<WUser>) -> bool {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
-            None => return false
-        };
-        println!("Insert object: ");
-        match connection.prepare("INSERT INTO WUser (id, name, pw, salt, token, mail) VALUES (:u_id, :u_name, :u_pw, :u_salt, :u_token, :u_mail)") {
-            Ok(mut stmt) => {
-                for obj in insert_object.iter() {
-                    stmt.execute(
-                        params! {
-                            "u_id"=>obj.ID,
-                            "u_name"=>&obj.name,
-                            "u_pw"=>&obj.pw,
-                            "u_salt"=>&obj.salt,
-                            "u_token"=>&obj.token,
-                            "u_mail"=>&obj.mail
-                        }
-                    ).unwrap();
-                }
-            }
-            Err(e) => println!("{}", e.to_string())
-        };
-        true
     }
     fn get_single_object(conn: Connection, item_id: u8) -> Option<WUser> {
         let mut connection;

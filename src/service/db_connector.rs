@@ -6,20 +6,34 @@ use rocket::http::Status;
 use rocket::request::{self, FromRequest};
 use std::{thread, time};
 use std::env;
+use rocket::config::ConfigError;
+
 
 #[derive(Debug, Clone)]
 pub struct Connection {
     conn: Pool
 }
+const ENV_VAR: &'static str = "DATABASE_URL";
 
 impl Connection {
-    pub fn connect() -> Option<Pool> {
-        match mysql::Pool::new(Self::get_var()) {
-            Ok(pool) => Some(pool),
+    pub fn connect() -> Result<Pool,Status> {
+        let vars = match Self::get_var() {
+            Ok(val) => val,
+            Err(_e) => return Err(Status::InternalServerError)
+        };
+        match mysql::Pool::new(vars) {
+            Ok(pool) => Ok(pool),
             Err(e) => {
                 println!("{}", e.to_string());
-                None
+                Err(Status::BadGateway)
             }
+        }
+    }
+
+    pub fn main_connect() -> Option<Pool> {
+        match Self::connect() {
+            Ok(val) => Some(val),
+            Err(_e) => None
         }
     }
 
@@ -41,26 +55,32 @@ impl Connection {
             .collect()
     }
 
-    fn get_var() -> String {
-        return match env::var("DATABASE_URL") {
-            Ok(val) => val,
+    fn get_var() -> Result<String,ConfigError> {
+        match env::var(ENV_VAR) {
+            Ok(val) => Ok(val),
             Err(e) => {
-                println!("{}", e.to_string());
-                "".to_string()
+                println!("Error: {}", e.to_string());
+                Err(ConfigError::Missing(e.to_string()))
             }
         }
     }
 
-    fn reconnect(counter: u8) -> Option<Pool> {
+    fn reconnect(counter: u8) -> Result<Pool,Status> {
         if counter == 0 {
-            return None
+            return Err(Status::ServiceUnavailable)
         }
         match Self::connect() {
-            Some(pool) => Some(pool),
-            None => {
+            Ok(pool) => Ok(pool),
+            Err(e) => {
                 println!("reconnect times: {}", counter);
-                thread::sleep(time::Duration::from_secs((counter*2).into()));
-                return Self::reconnect(counter-1)
+                match e {
+                    Status::InternalServerError => Err(Status::InternalServerError),
+                    Status::BadGateway | _=> {
+                        thread::sleep(time::Duration::from_secs((counter*2).into()));
+                        Self::reconnect(counter-1)
+                    },
+                }
+
             }
 
         }
@@ -75,8 +95,8 @@ impl<'a, 'r> FromRequest<'a, 'r> for Connection {
             Outcome::Success(value) if value.is_some() => Outcome::Success(Connection { conn: value.clone().unwrap() }),
             Outcome::Success(_) => {
                 match Self::reconnect(3){
-                    Some(conn) => Outcome::Success(Connection { conn: conn.clone() }),
-                    None => Outcome::Failure((Status::ServiceUnavailable, ())),
+                    Ok(conn) => Outcome::Success(Connection { conn: conn.clone() }),
+                    Err(status) => Outcome::Failure((status, ())),
                 }
 
             },

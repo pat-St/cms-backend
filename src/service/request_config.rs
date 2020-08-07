@@ -3,7 +3,7 @@ use model::model_template::ModelTemplate;
 use service::db_connector::Connection;
 use rocket::Outcome;
 use rocket::Outcome::{Success, Forward, Failure};
-use rocket::http::Status;
+use rocket::http::{Status, HeaderMap};
 use rocket::request::{self, Request, FromRequest};
 use base64;
 
@@ -39,17 +39,50 @@ impl<'a, 'r> FromRequest<'a, 'r> for AuthGuard {
             Forward(_) => return AuthGuard::failure_result(ApiKeyError::Missing),
             Failure(_) => return AuthGuard::failure_result(ApiKeyError::Invalid),
         };
-        let key: Vec<_> = request.headers().get("apikey").collect();
-        let api_key: String = match key.len() {
-            0 => return AuthGuard::failure_result(ApiKeyError::Missing),
-            1 => key[0].to_string(),
-            _ => return AuthGuard::failure_result(ApiKeyError::BadCount),
+        let api_key: String = match AuthGuard::get_bearer_token(request.headers()) {
+            Ok(val) => val,
+            Err(e) => return AuthGuard::failure_result(e)
         };
         match request.local_cache(|| WUser::get_multi_object(conn.clone())) {
             Some(users) if AuthGuard::is_key_valid(&api_key,users.as_slice()) => Outcome::Success(AuthGuard(conn.clone())),
             Some(_) => AuthGuard::failure_result(ApiKeyError::Invalid),
             None => AuthGuard::failure_result(ApiKeyError::BadCount),
         }
+    }
+}
+
+impl AuthGuard {
+    pub fn get_bearer_token(h: &HeaderMap) -> Result<String,ApiKeyError> {
+        if h.contains("apikey") {
+            return Self::extract_api_key(h);
+        }
+        if h.contains("Authorization") {
+            return Self::extract_auth_key(h);
+        }
+        return Err(ApiKeyError::Missing);
+    }
+
+    fn extract_api_key(h: &HeaderMap) -> Result<String,ApiKeyError> {
+        let key: Vec<_> = h.get("apikey").collect();
+        match key.len() {
+            0 => return Err(ApiKeyError::Missing),
+            1 => Ok(key[0].to_string()),
+            _ => return Err(ApiKeyError::BadCount),
+        }
+    }
+
+    fn extract_auth_key(h: &HeaderMap) -> Result<String,ApiKeyError> {
+        let key: Vec<_> = h.get("Authorization").collect();
+        let auth_key = match key.len() {
+            0 => return Err(ApiKeyError::Missing),
+            1 => key[0].to_string(),
+            _ => return Err(ApiKeyError::BadCount),
+        };
+        let auth_split = auth_key.split_whitespace().collect::<Vec<&str>>();
+        if auth_split.len() != 2 && auth_split[0] != "Bearer" {
+            return Err(ApiKeyError::Missing)
+        }
+        Ok(auth_split[1].to_string())
     }
 }
 

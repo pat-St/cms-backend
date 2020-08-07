@@ -17,8 +17,10 @@ mod controller;
 mod model;
 
 use rocket::{Request, Response};
-use rocket_contrib::json::{Json, JsonValue};
-use controller::{image_controller, info_text_controller, tile_controller, user_controller};
+use controller::{image_controller};
+use controller::tile_controller::{tile_controller,tile_order_controller};
+use controller::user_controller::login_controller;
+use controller::info_text_controller::*;
 use controller::apartment_controller::*;
 use service::db_connector::Connection;
 use rocket::http::{Status};
@@ -30,8 +32,10 @@ pub fn hello() -> &'static str {
 }
 
 #[catch(503)]
-fn service_not_available(_req: &Request) -> Json<JsonValue> {
-    Json(json!({ "status": "database currently not available"}))
+fn service_not_available(_req: &Request) -> response::Result<'static>{
+    Response::build()
+        .raw_header("Access-Control-Allow-Origin", "*")
+        .status(Status::InternalServerError).ok()
 }
 
 #[catch(422)]
@@ -47,10 +51,16 @@ fn not_found_entity(_req: &Request) ->  response::Result<'static>{
         .raw_header("Access-Control-Allow-Origin", "*")
         .status(Status::NotFound).ok()
 }
+#[catch(400)]
+fn bad_request(_req: &Request) ->  response::Result<'static>{
+    Response::build()
+        .raw_header("Access-Control-Allow-Origin", "*")
+        .status(Status::BadRequest).ok()
+}
 fn main() {
     rocket::ignite()
-        .manage(Connection::connect())
-        .register(catchers![service_not_available,unprocess_entity,not_found_entity])
+        .manage(Connection::main_connect())
+        .register(catchers![service_not_available,unprocess_entity,not_found_entity, bad_request])
         .mount(
             "/",
             routes![hello],
@@ -147,39 +157,51 @@ fn main() {
             ],
         )
         .mount(
+            "/tile_order",
+            routes![
+                tile_order_controller::get_single_object_by_id,
+                tile_order_controller::get_all_objects,
+                tile_order_controller::create_objects,
+                tile_order_controller::update_objects,
+                tile_order_controller::options_response,
+                tile_order_controller::options_id_response,
+                tile_order_controller::delete_objects
+            ],
+        )
+        .mount(
             "/info_text",
             routes![
-                info_text_controller::info_text_controller::get_single_object_by_id,
-                info_text_controller::info_text_controller::get_all_objects,
-                info_text_controller::info_text_controller::create_objects,
-                info_text_controller::info_text_controller::update_objects,
-                info_text_controller::info_text_controller::options_response,
-                info_text_controller::info_text_controller::options_id_response,
-                info_text_controller::info_text_controller::delete_objects
+                info_text_controller::get_single_object_by_id,
+                info_text_controller::get_all_objects,
+                info_text_controller::create_objects,
+                info_text_controller::update_objects,
+                info_text_controller::options_response,
+                info_text_controller::options_id_response,
+                info_text_controller::delete_objects
             ],
         )
         .mount(
             "/info_text_to_tile",
             routes![
-                info_text_controller::info_text_to_tile_controller::get_single_object_by_id,
-                info_text_controller::info_text_to_tile_controller::get_all_objects,
-                info_text_controller::info_text_to_tile_controller::create_objects,
-                info_text_controller::info_text_to_tile_controller::update_objects,
-                info_text_controller::info_text_to_tile_controller::options_response,
-                info_text_controller::info_text_to_tile_controller::options_id_response,
-                info_text_controller::info_text_to_tile_controller::delete_objects
+                info_text_to_tile_controller::get_single_object_by_id,
+                info_text_to_tile_controller::get_all_objects,
+                info_text_to_tile_controller::create_objects,
+                info_text_to_tile_controller::update_objects,
+                info_text_to_tile_controller::options_response,
+                info_text_to_tile_controller::options_id_response,
+                info_text_to_tile_controller::delete_objects
                 ],
         )
         .mount(
             "/user",
             routes![
-                user_controller::login_controller::user_login,
-                user_controller::login_controller::user_create,
-                user_controller::login_controller::user_logout,
-                user_controller::login_controller::options_signing_response,
-                user_controller::login_controller::options_response,
-                user_controller::login_controller::post_mock,
-                user_controller::login_controller::check_token,
+                login_controller::user_login,
+                login_controller::user_create,
+                login_controller::user_logout,
+                login_controller::options_signing_response,
+                login_controller::options_response,
+                login_controller::post_mock,
+                login_controller::check_token,
                 ]
         )
         .launch();

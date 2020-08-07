@@ -73,7 +73,10 @@ impl ModelTemplate<InfoTextToTile> for InfoTextToTile {
                     ).unwrap();
                 }
             }
-            Err(e) => println!("{}", e.to_string())
+            Err(e) => {
+                println!("{}", e.to_string());
+                return false 
+            }
         };
         true
     }

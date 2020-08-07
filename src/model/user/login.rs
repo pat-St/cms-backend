@@ -15,7 +15,7 @@ pub struct Token { pub token: String }
 impl Login {
     pub fn logout_user(username: String, users: Vec<WUser>) -> Option<WUser> {
         for mut i in users {
-            if i.name == username {
+            if i.name.to_uppercase() == username.to_uppercase() {
                 i.token = "".to_owned();
                 return Some(i)
             }
@@ -24,7 +24,7 @@ impl Login {
     }
     pub fn is_login_correct(self, users: Vec<WUser>) -> Option<WUser> {
         for mut i in users {
-            if i.name.eq(&self.name) && i.pw.eq(&self.pw) {
+            if i.name.to_uppercase().eq(&self.name.to_uppercase()) && i.pw.eq(&self.pw) {
                 i.token = Login::generate_key();
                 return Some(i)
             }
