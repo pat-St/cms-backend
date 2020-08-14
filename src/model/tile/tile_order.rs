@@ -1,4 +1,5 @@
 use mysql::Row;
+use crate::{service,model};
 use model::model_template::ModelTemplate;
 use service::db_connector::Connection;
 
@@ -11,9 +12,8 @@ pub struct TileOrder {
 }
 impl ModelTemplate<TileOrder> for TileOrder {
 	fn insert_values_object(conn: Connection, insert_object: Vec<TileOrder>) -> bool {
-		let mut connection;
-		match conn.get_connection() {
-			Some(value) => connection = value,
+		let mut connection = match conn.get_connection() {
+			Some(value) => value,
 			None => return false
 		};
 		match connection.prepare("INSERT INTO TileOrder (id,seqNum,fk_tile) VALUES (:item_id,:u_seq_num,:u_fk_tile)") {
@@ -36,9 +36,8 @@ impl ModelTemplate<TileOrder> for TileOrder {
 	}
 
 	fn update_values_object(conn: Connection, insert_object: Vec<TileOrder>) -> bool {
-		let mut connection;
-		match conn.get_connection() {
-			Some(value) => connection = value,
+		let mut connection = match conn.get_connection() {
+			Some(value) => value,
 			None => return false
 		};
 		println!("{:#?}",insert_object);
@@ -83,9 +82,8 @@ impl ModelTemplate<TileOrder> for TileOrder {
 	}
 
 	fn get_single_object(conn: Connection, item_id: u8) -> Option<TileOrder> {
-		let mut connection;
-		match conn.get_connection() {
-			Some(value) => connection = value,
+		let mut connection = match conn.get_connection() {
+			Some(value) => value,
 			None => return None
 		};
 		let result = connection.prep_exec("SELECT * FROM TileOrder WHERE id=:item_id", params! {"item_id"=>item_id});
@@ -93,9 +91,8 @@ impl ModelTemplate<TileOrder> for TileOrder {
 	}
 
 	fn get_multi_object(conn: Connection) -> Option<Vec<TileOrder>> {
-		let mut connection;
-		match conn.get_connection() {
-			Some(value) => connection = value,
+		let mut connection = match conn.get_connection() {
+			Some(value) => value,
 			None => return None
 		};
 		let result = connection.prep_exec("SELECT * FROM TileOrder", ());

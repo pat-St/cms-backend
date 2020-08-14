@@ -1,4 +1,5 @@
 use mysql::Row;
+use crate::{service,model};
 use model::model_template::ModelTemplate;
 use service::db_connector::Connection;
 
@@ -14,37 +15,36 @@ pub struct WUser {
 }
 
 impl ModelTemplate<WUser> for WUser {
-    fn insert_values_object(conn: Connection, insert_object: Vec<WUser>) -> bool {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
-            None => return false
-        };
-        println!("Insert object: ");
-        match connection.prepare("INSERT INTO WUser (id, name, pw, salt, token, mail) VALUES (:u_id, :u_name, :u_pw, :u_salt, :u_token, :u_mail)") {
-            Ok(mut stmt) => {
-                for obj in insert_object.iter() {
-                    stmt.execute(
-                        params! {
-                            "u_id"=>obj.ID,
-                            "u_name"=>&obj.name,
-                            "u_pw"=>&obj.pw,
-                            "u_salt"=>&obj.salt,
-                            "u_token"=>&obj.token,
-                            "u_mail"=>&obj.mail
-                        }
-                    ).unwrap();
-                }
-            }
-            Err(e) => println!("{}", e.to_string())
-        };
-        true
+    fn insert_values_object(_conn: Connection, _insert_object: Vec<WUser>) -> bool {
+        // let mut connection = match conn.get_connection() {
+        //     Some(value) => value,
+        //     None => return false
+        // };
+        // println!("Insert object: ");
+        // match connection.prepare("INSERT INTO WUser (id, name, pw, salt, token, mail) VALUES (:u_id, :u_name, :u_pw, :u_salt, :u_token, :u_mail)") {
+        //     Ok(mut stmt) => {
+        //         for obj in insert_object.iter() {
+        //             stmt.execute(
+        //                 params! {
+        //                     "u_id"=>obj.ID,
+        //                     "u_name"=>&obj.name,
+        //                     "u_pw"=>&obj.pw,
+        //                     "u_salt"=>&obj.salt,
+        //                     "u_token"=>&obj.token,
+        //                     "u_mail"=>&obj.mail
+        //                 }
+        //             ).unwrap();
+        //         }
+        //     }
+        //     Err(e) => println!("{}", e.to_string())
+        // };
+        // true
+        false
     }
     fn update_values_object(conn: Connection, insert_object: Vec<WUser>) -> bool {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
-            None => return false
+        let mut connection = match conn.get_connection() {
+            Some(value) => value,
+                 None => return false
         };
         match connection.prepare("UPDATE WUser SET \
              name=:u_name, \
@@ -118,6 +118,24 @@ impl ModelTemplate<WUser> for WUser {
                 println!("{}", e);
                 None
             }
+        }
+    }
+}
+
+impl WUser {
+    pub(crate) fn get_user_by_name(conn: Connection, username: &str) -> Option<WUser> {
+        let mut connection;
+        match conn.get_connection() {
+            Some(value) => connection = value,
+            None => return None
+        };
+        let result = connection.prep_exec("SELECT * FROM WUser WHERE name=:u_name", params! {"u_name"=>username});
+        Self::query_to_object(result)
+    }
+    pub(crate) fn check_user_non_exists(conn: Connection, user: &str) -> bool {
+        match WUser::get_user_by_name(conn,user) {
+            None => true,
+            Some(_) => false
         }
     }
 }

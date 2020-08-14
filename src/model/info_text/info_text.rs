@@ -1,5 +1,5 @@
 use mysql::Row;
-
+use crate::{service,model};
 use model::model_template::ModelTemplate;
 use service::db_connector::Connection;
 #[allow(non_snake_case)]
@@ -13,9 +13,8 @@ pub struct InfoText {
 
 impl ModelTemplate<InfoText> for InfoText {
     fn update_values_object(conn: Connection, insert_object: Vec<InfoText>) -> bool {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
+        let mut connection = match conn.get_connection() {
+            Some(value) => value,
             None => return false
         };
         match connection.prepare(

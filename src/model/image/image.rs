@@ -2,6 +2,7 @@ use std::io::Read;
 use mysql;
 use mysql::Row;
 use rocket::Data;
+use crate::{service,model};
 use model::image::images_template::ImagesTemplate;
 use service::db_connector::Connection;
 #[allow(non_snake_case)]
@@ -17,12 +18,11 @@ pub struct Image {
 
 impl ImagesTemplate<Image> for Image {
     fn update_values_object(conn: Connection, insert_object: Vec<Image>) -> bool {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
+        let mut connection = match conn.get_connection() {
+            Some(value) => value,
             None => return false
         };
-                //    image=:u_image, \
+        //    image=:u_image, \
         match connection.prepare("UPDATE Image SET \
            description=:u_description, \
             fk_apartment=:u_fk_apartment, \

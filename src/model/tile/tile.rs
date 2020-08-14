@@ -1,5 +1,5 @@
 use mysql::Row;
-
+use crate::{service,model};
 use model::model_template::ModelTemplate;
 use service::db_connector::Connection;
 #[allow(non_snake_case)]
@@ -15,9 +15,8 @@ pub struct Tile {
 
 impl ModelTemplate<Tile> for Tile {
     fn update_values_object(conn: Connection, insert_object: Vec<Tile>) -> bool {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
+        let mut connection = match conn.get_connection() {
+            Some(value) => value,
             None => return false
         };
         match connection.prepare(
@@ -65,9 +64,8 @@ impl ModelTemplate<Tile> for Tile {
         }
     }
     fn insert_values_object(conn: Connection, insert_object: Vec<Tile>) -> bool {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
+        let mut connection = match conn.get_connection() {
+            Some(value) => value,
             None => return false
         };
         println!("Insert object: ");
@@ -90,18 +88,16 @@ impl ModelTemplate<Tile> for Tile {
         true
     }
     fn get_single_object(conn: Connection, item_id: u8) -> Option<Tile> {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
+        let mut connection = match conn.get_connection() {
+            Some(value) => value,
             None => return None
         };
         let result = connection.prep_exec("SELECT * FROM Tile WHERE id=:item_id", params! {"item_id"=>item_id});
         Self::query_to_object(result)
     }
     fn get_multi_object(conn: Connection) -> Option<Vec<Tile>> {
-        let mut connection;
-        match conn.get_connection() {
-            Some(value) => connection = value,
+        let mut connection = match conn.get_connection() {
+            Some(value) => value,
             None => return None
         };
         let result = connection.prep_exec("SELECT * FROM Tile", ());

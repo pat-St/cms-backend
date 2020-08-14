@@ -1,6 +1,7 @@
 use rocket::Data;
 use rocket::http::{ContentType, RawStr};
 use rocket_contrib::json::Json;
+use crate::{service,model};
 use model::image::image::Image;
 use model::image::images_template::ImagesTemplate;
 use service::response_config::{ResponseWithHeader, ImageResponse};

@@ -1,8 +1,7 @@
 use mysql::error::Result as MyResult;
 use mysql::{QueryResult, Row};
-use service::db_connector::Connection;
-
 use rocket::Data;
+use crate::service::db_connector::Connection;
 
 pub trait ImagesTemplate<T> {
     fn insert_values_object(conn: Connection, insert_object: Vec<T>) -> bool;

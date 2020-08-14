@@ -1,6 +1,6 @@
 use mysql::error::Result as MyResult;
 use mysql::{QueryResult, Row};
-use service::db_connector::Connection;
+use crate::service::db_connector::Connection;
 
 pub(crate) trait ModelTemplate<T> {
     fn insert_values_object(conn: Connection, insert_object: Vec<T>) -> bool;

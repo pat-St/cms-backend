@@ -1,5 +1,5 @@
 use rocket_contrib::json::Json;
-
+use crate::{service,model};
 use model::fewo::details_to_apartment::DetailsToApartment;
 use model::model_template::ModelTemplate;
 use service::response_config::ResponseWithHeader;
